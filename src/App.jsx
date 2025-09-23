@@ -49,7 +49,7 @@ function App() {
             }))
             setQuiz(withShuffled)
             setCurrentQuestionIndex(0)
-             console.log(data.results)
+            console.log('fetchQuiz: loaded questions', withShuffled)
         } catch (err) {
             // show friendly message for 429
             if (err.status === 429) {
@@ -75,6 +75,7 @@ function App() {
             setCurrentQuestionIndex(prev => prev + 1)
             // ensure submitted is false for the newly loaded question
             setSubmitted(false)
+            console.log('fetchNextQuestion: appended', withShuffled)
         } catch (err) {
             console.error('Failed to fetch next question', err)
             setError('Failed to load next question')
@@ -102,13 +103,20 @@ function App() {
     const handleNextQuestion = async () => {
         // if user answered this question correctly, increment totalScore
         const currentQ = quiz[currentQuestionIndex]
+        console.log('handleNextQuestion: currentIndex', currentQuestionIndex, 'userAnswers', userAnswers, 'currentQ.correct_answer', currentQ.correct_answer)
         if (userAnswers[currentQuestionIndex] === currentQ.correct_answer) {
             setTotalScore(prev => prev + 1)
+            console.log('handleNextQuestion: incremented score')
         }
         // reset submitted state and fetch next question
         setSubmitted(false)
         await fetchNextQuestion()
     }
+
+    // trace key state changes for debugging
+    useEffect(() => {
+        console.log('STATE_TRACE -> currentQuestionIndex:', currentQuestionIndex, 'submitted:', submitted, 'totalScore:', totalScore)
+    }, [currentQuestionIndex, submitted, totalScore])
 
     const handleShowFinalScore = () => {
         // include current question correctness in final score if it was submitted
